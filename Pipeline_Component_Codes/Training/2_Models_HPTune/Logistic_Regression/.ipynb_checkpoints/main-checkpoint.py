@@ -1,11 +1,11 @@
 
-##
 
-def dt_training_function():
+def lr_training_function():
     import os
+    import traceback
+    import sys
     import pandas
     import logging
-    import traceback
     import argparse
     # from sklearn.externals import joblib
     import joblib
@@ -13,8 +13,9 @@ def dt_training_function():
     from sklearn.metrics import precision_score
     from sklearn.metrics import recall_score
     from sklearn.metrics import f1_score
-    from sklearn.tree import DecisionTreeClassifier
-      
+    from sklearn.linear_model import LogisticRegression
+
+    
 
     ###########################     Extracting the command line arguments     ########################
 
@@ -23,29 +24,26 @@ def dt_training_function():
 
     parser = argparse.ArgumentParser()
 
-    # Input
+    # Inputs
     parser.add_argument('--train', type=str, default=os.environ.get('SM_CHANNEL_TRAIN'))
     parser.add_argument('--test', type=str, default=os.environ.get('SM_CHANNEL_TEST'))
-    print("Done")
 
-    # Output
+    # Outputs
     parser.add_argument('--output_data_dir', type=str, default=os.environ.get('SM_OUTPUT_DATA_DIR'))
     parser.add_argument('--model_dir', type=str, default=os.environ.get('SM_MODEL_DIR'))
-    print("Done")
+
 
     # Hyperparameters
     ## Hyperparameters sent by the client are passed as command-line arguments to the script.
-    parser.add_argument('--criterion', type=str, default="gini")
-    parser.add_argument('--max_depth', type=int, default=4)
-    parser.add_argument('--min_samples_leaf', type=int, default=4)
+    parser.add_argument('--penalty', type=str, default="l2")
+    parser.add_argument('--C', type=float, default=1.0)
+    parser.add_argument('--solver', type=str, default="lbfgs")
     parser.add_argument('--objective_metric', type=str, default="accuracy")
 
     args, _ = parser.parse_known_args()
 
     ###########################     Extracting the command line arguments : End     ########################
     
-    print("Arguments parsed.")
-    print(args.criterion)
 
 
     ###########################     Creating the log extractor     ########################
@@ -53,7 +51,7 @@ def dt_training_function():
     logging.captureWarnings(True)
     logger = logging.getLogger()
     logger.setLevel(logging.DEBUG)
-    handler = logging.FileHandler(f'{args.output_data_dir}/DT_logfile.log')
+    handler = logging.FileHandler(f'{args.output_data_dir}/LR_logfile.log')
     # handler = logging.FileHandler('logfile.log')
     logger.addHandler(handler)
     formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
@@ -61,17 +59,32 @@ def dt_training_function():
 
     ###########################     Creating the log extractor : End     ########################
     
-    print("Logger created.")
-    
-
 
 
     try:
 
+
+        solver_penalty_mapper = {"newton-cg":["l2"], "lbfgs":["l2"], "liblinear":["l1", "l2"], "sag":["l2"], "saga":["elasticnet", "l1", "l2"]}
+
+
+        print(f"Solver type: {args.solver}")
+        print(f"Value of C: {args.C}")
+        print(f"Penalty type: {args.penalty}")
+
+        print(f"Checking whether given solver is {args.solver} compatible with the given penalty type {args.penalty}.")
+        if args.penalty in solver_penalty_mapper[args.solver]:
+            penalty = args.penalty
+            print("Check: OK")
+        else:
+            penalty = solver_penalty_mapper[args.solver][0]
+            print(f"Check: Penalty type changed from {args.penalty} to {penalty}")
+
+
+
         # Loading train and test data from args.train and args.test.
         train_data = pandas.read_csv(f"{args.train}/train.csv")
         test_data = pandas.read_csv(f"{args.test}/test.csv")
-        print(train_data.columns)
+        # print(train_data.columns)
 
 
 
@@ -81,26 +94,30 @@ def dt_training_function():
         X_test = test_data.drop(columns = ["Churn"])
         y_test = test_data.Churn
 
-        mod_dt = DecisionTreeClassifier(criterion = args.criterion, max_depth = args.max_depth, min_samples_leaf = args.min_samples_leaf)
-        mod_dt.fit(X_train, y_train)
+        # mod_dt = DecisionTreeClassifier(max_depth = args.max_depth, random_state = args.random_state)
+        # mod_dt.fit(X_train, y_train)
+        # logger.info("Model fitted.")
+
+        mod_lr = mod_lr = LogisticRegression(penalty = penalty, C = args.C, solver = args.solver)
+        mod_lr.fit(X_train, y_train)
         logger.info("Model fitted.")
 
 
 
         ## Writing model to disk.
-        joblib.dump(mod_dt, os.path.join(args.model_dir, "model.joblib"))
+        joblib.dump(mod_lr, os.path.join(args.model_dir, "model.joblib"))
         logger.info("Model written to disk.")
 
 
 
         ## Getting predictions and calculating accuracy.
-        prediction=mod_dt.predict(X_test)
-        pandas.DataFrame(prediction, columns = ["Predictions"]).to_csv(f"{args.output_data_dir}/Prediction.csv", index = False)
+        prediction=mod_lr.predict(X_test)
+        pandas.DataFrame(prediction, columns = ["Predictions"]).to_csv(f"{args.output_data_dir}/Prediction.csv")
         logger.info("Predictions written to disk.")
         
         
         ## Getting feature importance value
-        feat_importance = mod_dt.tree_.compute_feature_importances(normalize=False).tolist()
+        feat_importance = mod_lr.coef_.tolist()[0]
         print(feat_importance)
         print(X_train.columns.tolist())
         print(len(feat_importance))
@@ -109,7 +126,6 @@ def dt_training_function():
         feat_importance_record.to_csv(f"{args.output_data_dir}/Feature_Importance.csv", index = False)
         
         
-
         objective_metric = args.objective_metric
         if objective_metric == "anything":
             objective_metric = "accuracy"
@@ -129,12 +145,11 @@ def dt_training_function():
         logger.info(f"{objective_metric} calculated.")
         
         
-        
         ## Writing varius model performance metrics
         from datetime import date
         today = date.today()
         metrices = ["F1","Recall","Accuracy","Precision"]
-        train_prediction = mod_dt.predict(X_train)
+        train_prediction = mod_lr.predict(X_train)
         metrics = pandas.DataFrame([], columns = ["Training_Date","Dataset","Metric", "Value"])
         metrics["Training_Date"] = [today] * len(metrices) * 2
         metrics["Dataset"] = ["Train"] * len(metrices) + ["Test"] * len(metrices)
@@ -152,13 +167,11 @@ def dt_training_function():
         test_row = [tn, fp, fn, tp]
         matrix = pandas.DataFrame([[today, "Train"] + train_row, [today, "Test"] + test_row], columns = ["Confusion_Date", "Data", "TN", "FP", "FN", "TP"])
         matrix.to_csv(f"{args.output_data_dir}/Confusion_Matrix.csv", index = False)
-
-
-
+        
+        
         ## Closing the logger.
         logger.removeHandler(handler)
         handler.close()
-        
         
     except:
         var = traceback.format_exc()
@@ -173,4 +186,4 @@ def dt_training_function():
 
 
 if __name__ =='__main__':
-    dt_training_function()
+    lr_training_function()

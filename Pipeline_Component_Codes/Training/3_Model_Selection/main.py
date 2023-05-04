@@ -1,7 +1,8 @@
+# Follow this link to write the logis on how to get details of a hyperparameter tuning job.
+# https://sagemaker-examples.readthedocs.io/en/latest/hyperparameter_tuning/analyze_results/HPO_Analyze_TuningJob_Results.html
 
 def main(event, context):
     import boto3
-    import sagemaker
     import os
     region = boto3.Session().region_name
     sage_client = boto3.Session().client("sagemaker")
@@ -30,16 +31,16 @@ def main(event, context):
 
 
     # The following few lines will be necessary if we are trying to keep show all the results of the hyper parameter tuning job.
-    objective = tuning_job_result["HyperParameterTuningJobConfig"]["HyperParameterTuningJobObjective"]
-    is_minimize = objective["Type"] != "Maximize"
+#     objective = tuning_job_result["HyperParameterTuningJobConfig"]["HyperParameterTuningJobObjective"]
+#     is_minimize = objective["Type"] != "Maximize"
 
-    tuner = sagemaker.HyperparameterTuningJobAnalytics(tuning_job_name)
-    full_df = tuner.dataframe()
+#     tuner = sagemaker.HyperparameterTuningJobAnalytics(tuning_job_name)
+#     full_df = tuner.dataframe()
 
-    df = full_df[full_df["FinalObjectiveValue"] > -float("inf")]
-    if len(df) > 0:
-        df = df.sort_values("FinalObjectiveValue", ascending=is_minimize)
-    df.to_csv()
+#     df = full_df[full_df["FinalObjectiveValue"] > -float("inf")]
+#     if len(df) > 0:
+#         df = df.sort_values("FinalObjectiveValue", ascending=is_minimize)
+#     df.to_csv()
     
     
     return {"best_model_location":best_model_location, "best_metric_value":best_metric_value}

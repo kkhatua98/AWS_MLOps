@@ -1,5 +1,6 @@
 {
     "model_type": "sklearn_model",
+    "framework_version":"1.0-1",
     "model_name": "decision_tree",
     "entry_point": "main.py",
     "dependencies": "requirements.txt",
