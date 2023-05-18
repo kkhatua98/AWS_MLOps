@@ -48,13 +48,24 @@ def main(event, context):
         # df.to_csv()
     
     except:
-        model_and_metrices = event["model_and_metrices"]
-        models = [current["model"] for current in model_and_metrices]
-        metrices = [current["metrics"] for current in model_and_metrices]
-        model_locations = [current["best_model_location"] for current in model_and_metrices]
+#         model_and_metrices = event["model_and_metrices"]
+#         models = [current["model"] for current in model_and_metrices]
+#         metrices = [current["metrics"] for current in model_and_metrices]
+#         model_locations = [current["best_model_location"] for current in model_and_metrices]
+        
+#         best_metric_value = max(metrices)
 
-        best_model = models.index(max(metrices))
-        best_model_location = model_locations.index(max(metrices))
+#         best_model = models[metrices.index(best_metric_value)]
+#         best_model_location = model_locations[metrices.index(best_metric_value)]
+        
+        n = event['n']
+        metrices = [event[f"metrics{i}"] for i in range(n)]
+        
+        best_metric_value = max(metrices)
+        max_index = metrices.index(best_metric_value)
+        best_model = event[f"model{max_index}"]
+        best_model_location = event[f"best_model_location{max_index}"]
+        
 
 
     
