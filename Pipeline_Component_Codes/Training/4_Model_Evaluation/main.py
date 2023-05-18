@@ -94,7 +94,7 @@ def preprocessing_function():
             metric_value = f1_score(y, predictions)
             
         
-        report_dict = {"metrics": metric_value, "model": args.model_name, "best_model_location":args.best_model_location}
+        report_dict = {"best_metric_value": metric_value, "best_model": args.model_name, "best_model_location":args.best_model_location}
         
         evaluation_path = "/opt/ml/processing/test/evaluation.json"
         with open(evaluation_path, "w") as f:
