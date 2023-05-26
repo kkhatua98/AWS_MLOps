@@ -13,16 +13,18 @@ phases:
       - pip install json5==0.9.6
   build:
     commands:
+      - cp Helper_Functions/code_uploader.py .
+      - cp Helper_Functions/ipynb_to_py.py .
+      - cp Helper_Functions/lambda_create_update.py .
       - mkdir tmp_targz
-      - cp Pipeline_Builder/Helper_Functions/code_uploader.py .
-      - cp Pipeline_Builder/Helper_Functions/ipynb_to_py.py .
       - python code_uploader.py
-      - python ipynb_to_py.py --input_file Pipeline_Builder/Training_Pipeline_Builder.ipynb --output_file Training_Pipeline_Builder.py
-      - python Training_Pipeline_Builder.py   
-      - python ipynb_to_py.py --input_file Pipeline_Builder/Scoring_Pipeline_Builder.ipynb --output_file Scoring_Pipeline_Builder.py
-      - python Scoring_Pipeline_Builder.py
-      - python ipynb_to_py.py --input_file Pipeline_Builder/Monitoring.ipynb --output_file Monitoring.py
-      - python Monitoring.py
+      - python lambda_create_update.py
+      - python ipynb_to_py.py --input_file Pipeline_Training.ipynb --output_file Pipeline_Training.py
+      - python Pipeline_Training.py   
+      - python ipynb_to_py.py --input_file Pipeline_Scoring.ipynb --output_file Pipeline_Scoring.py
+      - python Pipeline_Scoring.py
+      - python ipynb_to_py.py --input_file Pipeline_Monitoring.ipynb --output_file Pipeline_Monitoring.py
+      - python Pipeline_Monitoring.py
 artifacts:
   files:
     - '**/*'

@@ -89,5 +89,10 @@
     "endpoint_scoring_code_location":"SageMaker_Pipeline_Component_Codes/Scoring/endpoint/endpoint_inference.py",
     "lambda_code_location":"endpoint_lambda/update_endpoint.py",
     "lambda_function_name":"churn_scoring_endpoint_updater",
-    "monitoring_code_file_name":"Monitoring.py"
+    "monitoring_code_file_name":"Monitoring.py",
+    
+    "endpoint_updater_lambda_function_name":"churn_scoring_endpoint_updater",
+    "role_given_to_lambda":"arn:aws:iam::852619674999:role/role_given_to_lambda",
+    
+    "output_notifier_lambda_function_name":"model_performance_notification",
 }
