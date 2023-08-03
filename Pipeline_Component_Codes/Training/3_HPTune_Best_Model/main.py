@@ -32,6 +32,15 @@ def main(event, context):
         best_training_job_name = tuning_job_result["BestTrainingJob"]["TrainingJobName"]
         best_training_job_result = sage_client.describe_training_job(TrainingJobName=best_training_job_name)
         best_model_location = best_training_job_result['ModelArtifacts']["S3ModelArtifacts"]
+        
+        
+        # Getting best training job's container location
+        best_training_job_container = best_training_job_result['AlgorithmSpecification']['TrainingImage']
+        
+        # Getting best training job instance type
+        best_instance_type = best_training_job_result["ResourceConfig"]["InstanceType"]
+        
+        best_metrics_path = ""
 
 
 
@@ -65,9 +74,14 @@ def main(event, context):
         max_index = metrices.index(best_metric_value)
         best_model = event[f"model{max_index}"]
         best_model_location = event[f"best_model_location{max_index}"]
+        best_training_job_container = event[f"best_training_job_container{max_index}"]
+        best_instance_type = event[f"best_instance_type{max_index}"]
+        best_metrics_path = event[f"metrics_path{max_index}"]
+        
+        print(best_metrics_path)
         
 
 
     
     
-    return {"best_model_location":best_model_location, "best_metric_value":best_metric_value, "best_model":best_model}
+    return {"best_model_location":best_model_location, "best_metric_value":best_metric_value, "best_model":best_model, "best_training_job_container":best_training_job_container, "best_instance_type":best_instance_type, "best_metrics_path":best_metrics_path}
