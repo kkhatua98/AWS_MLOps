@@ -3,6 +3,11 @@ import json
 
 ## Loading the configurations from config.json file.
 import json
+import os
+print(os.getcwd())
+
+print(a)
+
 with open("config.json") as file:
     build_parameters = json.load(file)
 

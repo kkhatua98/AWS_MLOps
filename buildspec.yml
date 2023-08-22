@@ -23,8 +23,6 @@ phases:
       - python Pipeline_Training.py   
       - python ipynb_to_py.py --input_file Pipeline_Scoring.ipynb --output_file Pipeline_Scoring.py
       - python Pipeline_Scoring.py
-      - python ipynb_to_py.py --input_file Pipeline_Monitoring.ipynb --output_file Pipeline_Monitoring.py
-      - python Pipeline_Monitoring.py
 artifacts:
   files:
     - '**/*'
