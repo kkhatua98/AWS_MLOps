@@ -1,0 +1,4 @@
+-mkdir -p build/python/lib/python3.7/site-packages
+-pip install -r requirements.txt -t build/python/lib/python3.7/site-packages
+-zip -r -X sm_layer.zip build/*
+-zip Lambda_Codes.zip Code lambda_handler.py
