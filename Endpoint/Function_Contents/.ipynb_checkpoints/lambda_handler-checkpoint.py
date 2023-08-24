@@ -1,6 +1,10 @@
 def lambda_handler(event, context = None):
     import boto3
     import sagemaker
+    import json
+    
+    with open("config.json") as file:
+        build_parameters = json.load(file)
     
     session = sagemaker.Session(default_bucket = "demo-output-bucket")
     role = sagemaker.get_execution_role()
@@ -9,8 +13,8 @@ def lambda_handler(event, context = None):
     client = boto3.client('sagemaker', region_name=region)
     
     # Obtain inputs from event
-    model_name = event["model_name"]
-    model_package_group_name = event["model_package_group_name"]
+    
+    model_package_group_name = build_parameters["model_package_group_name"]
     
     
     # Get the latest approved model
@@ -27,20 +31,26 @@ def lambda_handler(event, context = None):
     instance_type = latest_package_details["InferenceSpecification"]["SupportedTransformInstanceTypes"][0]
     
     # Deleting model, endpoint config and endpoint if already present.
+    endpoint_name = build_parameters["endpoint_name"]
     try:
-        # Deleting model
-        response = client.delete_model(
-            ModelName=model_name
+        response = client.describe_endpoint_config(
+            EndpointConfigName=endpoint_name
+        )
+        model_name = response["ProductionVariants"][0]["ModelName"]
+        
+        # Deleting endpoint
+        response = client.delete_endpoint(
+            EndpointName=endpoint_name
         )
         
         # Deleting endpoint config
         response = client.delete_endpoint_config(
-            EndpointConfigName=model_name
+            EndpointConfigName=endpoint_name
         )
         
-        # Deleting endpoint
-        response = client.delete_endpoint(
-            EndpointName=f"{model_name}-endpoint"
+        # Deleting model
+        response = client.delete_model(
+            ModelName=model_name
         )
     except:
         pass
@@ -58,4 +68,4 @@ def lambda_handler(event, context = None):
         model_data = model_data_url
     )
     
-    predictor = model.deploy(initial_instance_count=1, instance_type=instance_type, endpoint_name = "lambda-endpoint-11-2023", model_name = "demo-model")
+    predictor = model.deploy(initial_instance_count=1, instance_type=instance_type, endpoint_name = endpoint_name)

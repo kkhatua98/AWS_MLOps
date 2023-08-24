@@ -1,0 +1,9 @@
+{
+    "function_name":"build_model_update_endpoint",
+    "role":"arn:aws:iam::720541911643:role/role_given_to_lambda",
+    "runtime":"python3.7",
+    "inputs":{
+        "model_package_group_name":"churn-packagegroup",
+        "endpoint_name":"churn-inference-endpoint"
+    }
+}
