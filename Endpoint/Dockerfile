@@ -1,11 +1,27 @@
+# https://stackoverflow.com/questions/73607950/docker-file-aws-lambda-local-class-import-error
+# https://stackoverflow.com/questions/51409209/dockerfile-copy-files-from-amazon-s3-or-another-source-that-needs-credentials
+
 FROM public.ecr.aws/lambda/python:3.9
 
 # Copy function code
-COPY Function_Contents/ ${LAMBDA_TASK_ROOT} 
-COPY requirements.txt  ${LAMBDA_TASK_ROOT} 
+# COPY code ${LAMBDA_TASK_ROOT}/code
+# COPY requirements.txt ${LAMBDA_TASK_ROOT} 
+# COPY app.py ${LAMBDA_TASK_ROOT} 
+# COPY config.json ${LAMBDA_TASK_ROOT} 
+
+# ADD "s3://demo-inputs-bucket/Lambda_Code.zip" "${LAMBDA_TASK_ROOT}"
+# RUN yum install -y wget
+RUN yum install -y unzip
+RUN curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+RUN unzip awscliv2.zip
+RUN ./aws/install
+RUN aws s3api get-object --bucket demo-inputs-bucket --key Lambda_Code.zip Lambda_Code.zip
+# RUN curl "https://demo-inputs-bucket.s3.ap-south-1.amazonaws.com/Lambda_Code.zip"
+RUN unzip Lambda_Code.zip -d "${LAMBDA_TASK_ROOT}"
 
 # install dependencies
-RUN pip3 install --user -r requirements.txt
+RUN pip3 install -r requirements.txt --target "${LAMBDA_TASK_ROOT}"
+RUN pip3 install --upgrade "protobuf<=3.20.1" --target "${LAMBDA_TASK_ROOT}"
 
 # Set the CMD to your handler (could also be done as a parameter override outside of the Dockerfile)
-CMD [ "lamdba_handler.lambda_handler" ]
+CMD [ "app.lambda_handler" ]

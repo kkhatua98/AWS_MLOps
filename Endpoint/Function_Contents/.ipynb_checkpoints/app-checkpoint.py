@@ -1,20 +1,21 @@
+
 def lambda_handler(event, context = None):
     import boto3
     import sagemaker
     import json
-    
+    print("Imported libraries.")
     with open("config.json") as file:
         build_parameters = json.load(file)
     
-    session = sagemaker.Session(default_bucket = "demo-output-bucket")
+    session = sagemaker.Session(default_bucket = build_parameters["otuput_bucket"])
+    region = boto3.Session().region_name
     role = sagemaker.get_execution_role()
     
     # Create a low-level SageMaker service client.
     client = boto3.client('sagemaker', region_name=region)
     
     # Obtain inputs from event
-    
-    model_package_group_name = build_parameters["model_package_group_name"]
+    model_package_group_name = build_parameters["inputs"]["model_package_group_name"]
     
     
     # Get the latest approved model
@@ -31,7 +32,7 @@ def lambda_handler(event, context = None):
     instance_type = latest_package_details["InferenceSpecification"]["SupportedTransformInstanceTypes"][0]
     
     # Deleting model, endpoint config and endpoint if already present.
-    endpoint_name = build_parameters["endpoint_name"]
+    endpoint_name = build_parameters["inputs"]["endpoint_name"]
     try:
         response = client.describe_endpoint_config(
             EndpointConfigName=endpoint_name
@@ -69,3 +70,6 @@ def lambda_handler(event, context = None):
     )
     
     predictor = model.deploy(initial_instance_count=1, instance_type=instance_type, endpoint_name = endpoint_name)
+
+if __name__ == "__main__":
+    lambda_handler({})

@@ -5,5 +5,6 @@
     "inputs":{
         "model_package_group_name":"churn-packagegroup",
         "endpoint_name":"churn-inference-endpoint"
-    }
+    },
+    "otuput_bucket":"demo-output-bucket"
 }
