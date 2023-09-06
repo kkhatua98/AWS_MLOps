@@ -4,25 +4,21 @@ version: 0.2
 phases:
   install:
     runtime-versions:
-      python: 3.7
+      python: 3.11
     commands:
-      - pip install awscli==1.22.97
-      - pip install boto3==1.21.42
-      - pip install sagemaker==2.86.2 
-      - pip install protobuf==3.20.0rc2
-      - pip install json5==0.9.6
+      - pip install -r requirements.txt
   build:
-    commands:
-      - cp Helper_Functions/code_uploader.py .
-      - cp Helper_Functions/ipynb_to_py.py .
-      - cp Helper_Functions/lambda_create_update.py .
-      - mkdir tmp_targz
-      - python code_uploader.py
-      - python lambda_create_update.py
-      - python ipynb_to_py.py --input_file Pipeline_Training.ipynb --output_file Pipeline_Training.py
+    commands: 
+      - python Helper_Functions/ipynb_to_py.py --input_file Pipelines/Training/Pipeline_Training.ipynb --output_file Pipeline_Training.py
       - python Pipeline_Training.py   
-      - python ipynb_to_py.py --input_file Pipeline_Scoring.ipynb --output_file Pipeline_Scoring.py
+      - python Helper_Functions/ipynb_to_py.py --input_file Pipelines/Training/Pipeline_Training.ipynb --output_file Pipeline_Training.py
       - python Pipeline_Scoring.py
+  post-build:
+    commands: 
+      - cd Endpoint/Function_Contents/
+      - zip -r Lambda_Code.zip .
+      - aws s3 cp Lambda_Code.zip s3://demo-inputs-bucket/Lambda/Lambda_Code.zip
+  
 artifacts:
   files:
     - '**/*'
