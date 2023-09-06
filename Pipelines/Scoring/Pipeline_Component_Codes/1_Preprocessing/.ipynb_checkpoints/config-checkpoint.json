@@ -1,0 +1,8 @@
+{
+    "processing_type":"sklearn",
+    "framework_version":"0.23-1",
+    "entry_point":"Training_Preprocessing.py",
+    "dependencies":"requirements.txt",
+    "machine_type": "ml.m4.xlarge",
+    "machine_count":1
+}
