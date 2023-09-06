@@ -9,8 +9,8 @@ phases:
       - pip install -r requirements.txt
   build:
     commands: 
-      - python Helper_Functions/ipynb_to_py.py --input_file Pipelines/Training/Pipeline_Training.ipynb --output_file Pipeline_Training.py
-      - python Helper_Functions/ipynb_to_py.py --input_file Pipelines/Scoring/Pipeline_Scoring.ipynb --output_file Pipeline_Scoring.py
+      - python Helper_Functions/ipynb_to_py.py --input_file Pipelines/Training/Pipeline_Training.ipynb --output_file Pipelines/Training/Pipeline_Training.py
+      - python Helper_Functions/ipynb_to_py.py --input_file Pipelines/Scoring/Pipeline_Scoring.ipynb --output_file Pipelines/Scoring/Pipeline_Scoring.py
       - cd Pipelines/Training/
       - python Pipeline_Training.py
       - cd ../Scoring
