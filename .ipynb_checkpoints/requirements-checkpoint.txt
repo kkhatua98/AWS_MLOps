@@ -1,6 +1,5 @@
-awscli==1.22.97
+awscli==1.29.14
 boto3==1.28.14
 sagemaker==2.173.0
-protobuf==3.20.0rc2
 json5==0.9.6
 jupytext==1.15.0
