@@ -15,6 +15,7 @@ phases:
       - python Pipeline_Training.py
       - cd ../Scoring
       - python Pipeline_Scoring.py
+      - cd ../../
   post_build:
     commands: 
       - cd Endpoint/Function_Contents/
