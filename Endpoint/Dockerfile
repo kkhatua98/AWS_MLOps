@@ -24,8 +24,8 @@ RUN pip3 install --upgrade "protobuf<=3.20.1" --target "${LAMBDA_TASK_ROOT}"
 # RUN curl "https://demo-inputs-bucket.s3.ap-south-1.amazonaws.com/Lambda_Code.zip"
 # RUN unzip Lambda_Code.zip -d "${LAMBDA_TASK_ROOT}"
 
-COPY script.sh /script.sh
-RUN chmod +x /script.sh
+# COPY script.sh /script.sh
+RUN chmod +x script.sh
 
 
 ENTRYPOINT ["/script.sh"]
