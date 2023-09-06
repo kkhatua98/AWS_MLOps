@@ -11,9 +11,9 @@ phases:
     commands: 
       - python Helper_Functions/ipynb_to_py.py --input_file Pipelines/Training/Pipeline_Training.ipynb --output_file Pipeline_Training.py
       - python Pipeline_Training.py   
-      - python Helper_Functions/ipynb_to_py.py --input_file Pipelines/Training/Pipeline_Training.ipynb --output_file Pipeline_Training.py
+      - python Helper_Functions/ipynb_to_py.py --input_file Pipelines/Scoring/Pipeline_Scoring.ipynb --output_file Pipeline_Scoring.py
       - python Pipeline_Scoring.py
-  post-build:
+  post_build:
     commands: 
       - cd Endpoint/Function_Contents/
       - zip -r Lambda_Code.zip .
