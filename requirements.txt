@@ -1,6 +1,6 @@
 awscli==1.22.97
-boto3==1.21.42
-sagemaker==2.86.2 
+boto3==1.28.14
+sagemaker==2.173.0
 protobuf==3.20.0rc2
 json5==0.9.6
 jupytext==1.15.0
