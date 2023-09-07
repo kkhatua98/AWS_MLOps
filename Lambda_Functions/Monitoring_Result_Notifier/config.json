@@ -1,8 +1,0 @@
-{
-    "function_name":"churn_scoring_endpoint_updater",
-    "role":"arn:aws:iam::720541911643:role/role_given_to_lambda",
-    "inputs":{
-        "model_package_group_name":"churn-packagegroup",
-        "endpoint_name":"churn-inference-endpoint",
-    }
-}
