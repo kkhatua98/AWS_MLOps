@@ -21,6 +21,8 @@ phases:
       - cd ../Scoring
       - python Pipeline_Scoring.py
       - cd ../../
+      - pwd
+      - git status
       - git diff --name-only $CODEBUILD_RESOLVED_SOURCE_VERSION $CODEBUILD_WEBHOOK_PREV_COMMIT
       - | 
           if [ "$(git diff --name-only $CODEBUILD_RESOLVED_SOURCE_VERSION $CODEBUILD_WEBHOOK_PREV_COMMIT | grep -e Endpoint/)" != "" ]; then 
