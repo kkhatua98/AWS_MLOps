@@ -21,8 +21,6 @@ phases:
       - cd ../Scoring
       - python Pipeline_Scoring.py
       - cd ../../
-  post_build:
-    commands: 
       - | 
           if [ "$(git diff --name-only $CODEBUILD_RESOLVED_SOURCE_VERSION $CODEBUILD_WEBHOOK_PREV_COMMIT | grep -e Endpoint/)" != "" ]; then 
             echo "Change detected."
@@ -32,6 +30,17 @@ phases:
             docker tag python_repository:latest 720541911643.dkr.ecr.ap-south-1.amazonaws.com/python_repository:latest
             docker push 720541911643.dkr.ecr.ap-south-1.amazonaws.com/python_repository:latest
           fi
+  post_build:
+    commands: 
+      # - | 
+      #     if [ "$(git diff --name-only $CODEBUILD_RESOLVED_SOURCE_VERSION $CODEBUILD_WEBHOOK_PREV_COMMIT | grep -e Endpoint/)" != "" ]; then 
+      #       echo "Change detected."
+      #       cd Endpoint
+      #       aws ecr get-login-password --region ap-south-1 | docker login --username AWS --password-stdin 720541911643.dkr.ecr.ap-south-1.amazonaws.com
+      #       docker build -t python_repository .
+      #       docker tag python_repository:latest 720541911643.dkr.ecr.ap-south-1.amazonaws.com/python_repository:latest
+      #       docker push 720541911643.dkr.ecr.ap-south-1.amazonaws.com/python_repository:latest
+      #     fi
       # - zip -r Lambda_Code.zip .
       # - aws s3 cp Lambda_Code.zip s3://demo-inputs-bucket/Lambda/Lambda_Code.zip
   
