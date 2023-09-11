@@ -1,3 +1,8 @@
+
+# How to write if else statements in buildspec file: https://github.com/aws-samples/aws-codebuild-multiple-buildspec/issues/2
+# How to get whether a folder has any change inside it from previous commit in buildspec: https://stackoverflow.com/questions/67483966/how-can-an-aws-codebuild-job-see-which-files-have-changed
+
+
 version: 0.2
 
         
@@ -18,9 +23,17 @@ phases:
       - cd ../../
   post_build:
     commands: 
-      - cd Endpoint/Function_Contents/
-      - zip -r Lambda_Code.zip .
-      - aws s3 cp Lambda_Code.zip s3://demo-inputs-bucket/Lambda/Lambda_Code.zip
+      - | 
+          if [ "$(git diff --name-only $CODEBUILD_RESOLVED_SOURCE_VERSION $CODEBUILD_WEBHOOK_PREV_COMMIT | grep -e Endpoint/)" != "" ]; then 
+            echo "Change detected."
+            cd Endpoint
+            aws ecr get-login-password --region ap-south-1 | docker login --username AWS --password-stdin 720541911643.dkr.ecr.ap-south-1.amazonaws.com
+            docker build -t python_repository .
+            docker tag python_repository:latest 720541911643.dkr.ecr.ap-south-1.amazonaws.com/python_repository:latest
+            docker push 720541911643.dkr.ecr.ap-south-1.amazonaws.com/python_repository:latest
+          fi
+      # - zip -r Lambda_Code.zip .
+      # - aws s3 cp Lambda_Code.zip s3://demo-inputs-bucket/Lambda/Lambda_Code.zip
   
 artifacts:
   files:
