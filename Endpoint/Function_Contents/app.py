@@ -90,14 +90,25 @@ def lambda_handler(event, context = None):
     
     
     # In the following way we have to get predictions from the Sklearn endpoint.
+    # See this link to get the idea on how to get predictions from a SageMaker Scikit-Learn Endpoint: 
+    # https://stackoverflow.com/questions/63568274/how-to-use-serializer-and-deserializer-in-sagemaker-2
     # from sagemaker.deserializers import JSONDeserializer
     # from sagemaker.serializers import CSVSerializer
     # predictor = sagemaker.predictor.Predictor(endpoint_name = "churn-endpoint-12345",
     #                                           serializer = CSVSerializer(),
     #                                           # content_type  = "text/csv"
     #                                          )
+    # import pandas as pd
+    # s3 = pd.read_csv("s3://demo-output-bucket/Training_Pipeline_Output/2023-08-02T06:55:59.009Z/TrainProcessingOutput/test.csv")
+    # s3 = s3.drop(columns = ["Churn"])
+    # result = predictor.predict(s3)
+    # print(result)
+    
+    
     
     # In the following way we have to get predictions from the Tensorflow endpoint.
+    # See the following link to understand how to get predictions from the endpoint:
+    # https://sagemaker.readthedocs.io/en/stable/frameworks/tensorflow/deploying_tensorflow_serving.html#making-predictions-against-a-sagemaker-endpoint
     # from sagemaker.serializers import JSONSerializer
     # predictor = sagemaker.predictor.Predictor(endpoint_name = "tensorflow-inference-fashion-mnist-111",
     #                                           serializer = JSONSerializer(),
