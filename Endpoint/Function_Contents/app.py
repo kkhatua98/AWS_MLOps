@@ -61,15 +61,56 @@ def lambda_handler(event, context = None):
 
     
     from sagemaker.model import Model
-    model = Model(
-        entry_point = "Evaluation.py",
-        source_dir = "code", 
-        role = role,
-        image_uri = image_url,
-        model_data = model_data_url
-    )
+    from sagemaker.tensorflow import TensorFlowModel
+    
+    sklearn_models = ["Decision_Tree", "Logistic_Regression"]
+    if any([model in model_data_url for model in sklearn_models]):
+        model = Model(
+            entry_point = "Evaluation.py",
+            source_dir = "code/Sklearn_Endpoint", 
+            role = role,
+            image_uri = image_url,
+            model_data = model_data_url
+        )
+        
+        
+        
+    elif "Tensorflow" in model_data_url:
+        model = TensorFlowModel(
+            model_data=model_data_url, 
+            role = role, 
+            framework_version = "1.15.2", 
+            entry_point = "inference.py", 
+            source_dir = "code/Tensorflow_Endpoint"
+        )
+        
+        
     
     predictor = model.deploy(initial_instance_count=1, instance_type=instance_type, endpoint_name = endpoint_name)
+    
+    
+    # In the following way we have to get predictions from the Sklearn endpoint.
+    # from sagemaker.deserializers import JSONDeserializer
+    # from sagemaker.serializers import CSVSerializer
+    # predictor = sagemaker.predictor.Predictor(endpoint_name = "churn-endpoint-12345",
+    #                                           serializer = CSVSerializer(),
+    #                                           # content_type  = "text/csv"
+    #                                          )
+    
+    # In the following way we have to get predictions from the Tensorflow endpoint.
+    # from sagemaker.serializers import JSONSerializer
+    # predictor = sagemaker.predictor.Predictor(endpoint_name = "tensorflow-inference-fashion-mnist-111",
+    #                                           serializer = JSONSerializer(),
+    #                                           # content_type  = "text/csv"
+    #                                          )
+    # import numpy as np
+    # random_array = np.random.randn(28, 28)
+    # random_list = random_array.tolist()
+    
+    # inputs= {'instances': random_list}      # This formation is important.
+    # result = predictor.predict(inputs)
+    # print(result)
+    
 
 if __name__ == "__main__":
     lambda_handler({})
