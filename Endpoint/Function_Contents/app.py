@@ -76,6 +76,9 @@ def lambda_handler(event, context = None):
         
         
     elif "Tensorflow" in model_data_url:
+        # See the following links to deploy a Tensorflow model:
+        # https://sagemaker.readthedocs.io/en/stable/frameworks/tensorflow/deploying_tensorflow_serving.html#deploying-directly-from-model-artifacts
+        # https://github.com/mobassir94/Deploy-trained-TensorFlow-2.x-models-using-Amazon-SageMaker/blob/main/How_to_deploy_custom_tf_2_x_model_using_aws_sagemaker.ipynb
         model = TensorFlowModel(
             model_data=model_data_url, 
             role = role, 

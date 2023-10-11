@@ -1,4 +1,5 @@
-
+# See this link to understand how to write custom inference file to host sklearn models in SageMaker Endpoint:
+# https://stackoverflow.com/questions/71340893/when-i-get-a-prediction-from-sagemaker-endpoint-what-does-the-endpoint-do
 
 def model_fn(model_dir):
     """
